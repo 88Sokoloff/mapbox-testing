@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>OBOZ Canvas Test</title>
+	<link href='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+	<script src='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
+	<script src="js/fabric.js"></script>
+	<link rel="stylesheet" href="style/style.css">
+</head>
+<body>
+	<h1 class="title">OBOZ Plan Testing</h1>
+
+	<h2 class="subtitle">Floor plan</h2>
+
+	<div class="plan-wr">
+		<img src="img/plan.png" alt="Plan of the floor" class="plan" />
+		<canvas id="floor"></canvas>
+	</div>
+
+	<script>
+		window.onload = function(){
+			let w = document.querySelector('.plan').clientWidth,
+				h = document.querySelector('.plan').clientHeight;
+
+			console.log(w, h);
+
+			document.querySelector('#floor').width = w;
+			document.querySelector('#floor').height = h;
+			
+			let canvas = new fabric.Canvas('floor');
+
+			var flat = new fabric.Polygon([
+				{x:5, y:50},
+				{x:200, y:50},
+				{x:200, y:140},
+				{x:130, y:140},
+				{x:130, y:180},
+				{x:70, y:180},
+				{x:70, y:330},
+				{x:5, y:330}
+			], {
+				fill: 'rgba(95,158,160,.8)',
+				stroke: 'rgb(95,158,160)',
+				left: 0,
+				top: 0,
+			});
+
+			var rect = new fabric.Rect({
+				top: 100,
+				left: 100,
+				width: 60,
+				height: 70,
+				fill: 'red'
+			});
+
+			canvas.add(rect, flat);
+
+			canvas.on('mouse:over', function(e){
+				if(e.target) e.target.set('fill', 'rgba(95,158,160,1)');
+				canvas.renderAll();
+			});
+
+			canvas.on('mouse:out', function(e){
+				if(e.target) e.target.set('fill', 'rgba(95,158,160,.8)');
+				canvas.renderAll();
+			});
+
+
+			
+
+			// var canvas = document.getElementById('floor');
+			// if(canvas.getContext){
+			// 	var ctx = canvas.getContext('2d');
+
+			// 	ctx.lineWidth = 4;
+			// 	ctx.fillStyle = 'rgba(95,158,160,.8)';
+			// 	ctx.strokeStyle = 'rgb(95,158,160)';
+
+			// 	ctx.beginPath();
+			// 	ctx.moveTo(4, 50);
+			// 	ctx.lineTo(200, 50);
+			// 	ctx.lineTo(200, 140);
+			// 	ctx.lineTo(130, 140);
+			// 	ctx.lineTo(130, 180);
+			// 	ctx.lineTo(70, 180);
+			// 	ctx.lineTo(70, 330);
+			// 	ctx.lineTo(4, 330);
+			// 	ctx.lineTo(4, 50);
+			// 	ctx.fill();
+			// 	ctx.stroke();
+			// }	
+		}
+	</script>
+</body>
+</html>

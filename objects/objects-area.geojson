@@ -1,0 +1,266 @@
+{
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "district-ru": "Печерский",
+        "color": "rgb(255, 211, 79)",
+        "obj-page": "https://www.obozrevatel.com/ukr/",
+        "city-ru": "Киев",
+        "price": 0,
+        "developer": "ObozDomDevelopment",
+        "district-ua": "Печерський",
+        "name": "Area",
+        "city-ua": "Київ",
+        "walk-time": 11,
+        "state": "process",
+        "station": "Arsenalna",
+        "image": "img/object1.jpg",
+        "title": "Lavra House",
+        "object": "oboz"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              30.549909,
+              50.441
+            ],
+            [
+              30.548592,
+              50.442034
+            ],
+            [
+              30.549013,
+              50.442271
+            ],
+            [
+              30.549121,
+              50.442401
+            ],
+            [
+              30.54971,
+              50.442746
+            ],
+            [
+              30.551322,
+              50.441708
+            ],
+            [
+              30.550486,
+              50.441341
+            ],
+            [
+              30.549909,
+              50.441
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": "06073561176b89675ca54163f5e11c77"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district-ru": "Печерский",
+        "color": "rgb(255, 211, 79)",
+        "obj-page": "https://www.obozrevatel.com/ukr/",
+        "city-ru": "Киев",
+        "price": "продажи не начнутся",
+        "developer": "VylaDevelopment",
+        "district-ua": "Печерський",
+        "name": "Area",
+        "city-ua": "Київ",
+        "walk-time": 3,
+        "state": "process",
+        "station": "Arsenalna",
+        "image": "img/object3.jpg",
+        "title": "Liashko Mariinsky Complex"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              30.541693,
+              50.444309
+            ],
+            [
+              30.542991,
+              50.445215
+            ],
+            [
+              30.542957,
+              50.44533
+            ],
+            [
+              30.543634,
+              50.446077
+            ],
+            [
+              30.543555,
+              50.446228
+            ],
+            [
+              30.542743,
+              50.44676
+            ],
+            [
+              30.54114,
+              50.447658
+            ],
+            [
+              30.539357,
+              50.448528
+            ],
+            [
+              30.536569,
+              50.450087
+            ],
+            [
+              30.534086,
+              50.448334
+            ],
+            [
+              30.541693,
+              50.444309
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": "1900fb4377af20d301ae6d012cab946c"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district-ru": "Печерский",
+        "color": "rgb(229, 11, 47)",
+        "obj-page": "https://www.obozrevatel.com/ukr/",
+        "city-ru": "Киев",
+        "price": "продажи не начнутся",
+        "developer": "ObozDomDevelopment",
+        "district-ua": "Печерський",
+        "name": "Area",
+        "city-ua": "Київ",
+        "walk-time": 5,
+        "state": "cancel",
+        "station": "Arsenalna",
+        "image": "img/object2.jpg",
+        "title": "Arsenal House"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              30.54289,
+              50.438585
+            ],
+            [
+              30.544027,
+              50.43926
+            ],
+            [
+              30.544261,
+              50.439084
+            ],
+            [
+              30.544261,
+              50.439059
+            ],
+            [
+              30.544258,
+              50.439023
+            ],
+            [
+              30.544249,
+              50.438989
+            ],
+            [
+              30.544219,
+              50.438963
+            ],
+            [
+              30.544196,
+              50.438937
+            ],
+            [
+              30.543865,
+              50.438739
+            ],
+            [
+              30.543631,
+              50.438579
+            ],
+            [
+              30.543472,
+              50.438397
+            ],
+            [
+              30.543111,
+              50.438451
+            ],
+            [
+              30.54289,
+              50.438585
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": "620a3d4a14cfebf9fb6a1bbc1fee7f8f"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district-ru": "Печерский",
+        "color": "rgb(71, 186, 61)",
+        "obj-page": "https://www.obozrevatel.com/ukr/",
+        "city-ru": "Киев",
+        "price": "продажи не начнутся",
+        "developer": "ObozDomDevelopment",
+        "district-ua": "Печерський",
+        "name": "Area",
+        "city-ua": "Київ",
+        "walk-time": 5,
+        "state": "complete",
+        "station": "Arsenalna",
+        "image": "img/object1.jpg",
+        "title": "Oboz Secret Base"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              30.545001,
+              50.437228
+            ],
+            [
+              30.545004,
+              50.437324
+            ],
+            [
+              30.544989,
+              50.437501
+            ],
+            [
+              30.545373,
+              50.437503
+            ],
+            [
+              30.545382,
+              50.437224
+            ],
+            [
+              30.545001,
+              50.437228
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": "7842bea7d24a627fa4e9f3e3d8ec35dc"
+    }
+  ],
+  "type": "FeatureCollection"
+}

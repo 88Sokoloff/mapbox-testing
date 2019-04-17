@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>OBOZ Mapbox Test</title>
+	<link href='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+	<script src='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
+	<link rel="stylesheet" href="style/style.css">
+</head>
+<body>
+	<h1 class="title">OBOZ Mapbox Testing</h1>
+	<div id="map"></div>
+
+	<div class="filter">
+		<button id="cancel">Hide/show cancelled</button>
+		<button id="complete">Hide/show completed</button>
+	</div>
+	
+	<!-- Card of the object -->
+	<div class="card">
+		<button type="button" class="card-close"></button>
+		<a href="plan.html" class="card-media">
+			<img class="card-image" src="img/object1.jpg" alt="Oboz">
+			<div class="card-content">
+				<div class="card-location">Киев, Печерский</div>
+				<div class="card-title">Oboz</div>
+				<div class="card-direction">
+					<svg class="ico" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FE161D">
+						<path d="M12 23C5.925 23 1 18.075 1 12S5.925 1 12 1s11 4.925 11 11-4.925 11-11 11zm0-1.7a9.3 9.3 0 1 0 0-18.6 9.3 9.3 0 0 0 0 18.6zm.006-9.47L14.971 7l3.406 9.108h-3.21l-1.149-2.962L12.014 17l-2.021-3.854-1.163 2.962H5.65L9.04 7l2.966 4.83z"></path>
+					</svg>
+					<div class="card-direction-label">Arsenalna</div>
+					<svg class="ico" fill="#9e9e9e" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+						<path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"></path>
+					</svg>
+					<div class="card-walk">15 мин</div>
+				</div>
+			</div>
+		</a>
+		<div class="card-content">
+			<div class="card-price">Продажи не начнутся</div>
+			<div class="card-text">1 дом в проекте</div>
+			<div class="card-text">ObozDomDevelopment</div>
+			<div class="card-actions">
+				<a href="https://www.obozrevatel.com/ukr/" rel="nofollow" target="_blank">страница объекта</a>
+				<div class="button -icon favorite" data-favorites="buildings-5085">
+					<svg class="ico" fill="#9e9e9e" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+						<path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"></path>
+					</svg>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js' charset='utf-8'></script>
+	<script>
+		mapboxgl.accessToken = 'pk.eyJ1IjoiODhzb2tvbG9mZiIsImEiOiJjanN3d2tzZncwZW40NDRvZnVhYjFzNWdmIn0.pKR58x1O09IftAYhGgtRrA';
+		var map = new mapboxgl.Map({
+			container: 'map',
+			attributionControl: false,
+			style: 'mapbox://styles/88sokoloff/cjth19wu40jxi1fjywl6mzyut',
+			center: [30.520119, 50.445432],
+			zoom: 12,
+			minZoom: 8,
+			logoPosition: "top-left"
+		}).addControl(new mapboxgl.AttributionControl({
+			compact: true
+		}));
+
+		map.on('load', function() {
+			map.setLight({color: "white", intensity: 0.6, position: [1.15, 135, 45]});
+
+			map.addSource('objects-far', {
+				'type': 'vector',
+				'url': 'mapbox://88sokoloff.cjtigqc5i0wlz2rmh44brkpbx-3ym5t'
+			});
+
+			map.addSource('objects-area', {
+				'type': 'vector',
+				'url': 'mapbox://88sokoloff.cjub9cs4n02x32rs8mh4bu8u6-191pp'
+			});
+
+			map.addSource('objects-close', {
+				'type': 'vector',
+				'url': 'mapbox://88sokoloff.cjtfvdyrb097p2sp3we9a37w8-6vnh0'
+			});
+
+			map.addLayer({
+				'id': 'objects-area',
+				'type': 'fill',
+				'minzoom': 15.25,
+				'source': 'objects-area',
+				"source-layer": "objects-area",
+				'paint': {
+					'fill-color': ['get', "color"],
+					"fill-opacity": 0.4
+				}
+			});
+
+			map.addLayer({
+				'id': 'objects-stroke',
+				'type': 'line',
+				'minzoom': 15.25,
+				'source': 'objects-area',
+				'source-layer': "objects-area",
+				'paint': {
+					'line-color': ['get', "color"],
+					'line-width': 3
+				}
+			});
+			
+			map.addLayer({
+				'id': 'objects-close',
+				'type': 'fill-extrusion',
+				'minzoom': 15.25,
+				'source': 'objects-close',
+				"source-layer": "objects-close",
+				'paint': {
+					'fill-extrusion-color': ['get', 'color'],
+					'fill-extrusion-height': ['get', 'height'],
+					'fill-extrusion-base': ['get', 'base_height'],
+					'fill-extrusion-opacity': 0.8
+				}
+			});
+
+			map.addLayer({
+				"id": "objects-far",
+				"type": "circle",
+				"maxzoom": 15.25,
+				"source": 'objects-far',
+				"source-layer": "objects-far",
+				"paint": {
+					"circle-radius": [
+						"interpolate", ["linear"], ["zoom"],
+						10, 1, 22, 20,
+					],
+					"circle-color": ["get", "color"],
+					"circle-opacity": 0.8,
+					"circle-stroke-width": 1,
+					"circle-stroke-color": "#fff"
+				}
+			});
+
+			// Create a popup, but don't add it to the map yet.
+			var popup = new mapboxgl.Popup({
+				closeButton: false,
+				closeOnClick: false,
+				className: "pop-up-txt"
+			});
+			
+			map.on('mouseenter', 'objects-area', function(e){
+				map.getCanvas().style.cursor = 'pointer';
+				
+				var coordinates = e.features[0].geometry.coordinates.slice();
+				var center = new mapboxgl.LngLatBounds(coordinates[0][0], coordinates[0][2]).getCenter();
+				var title = e.features[0].properties.title;
+								
+				popup.setLngLat(center)
+					.setText(title)
+					.addTo(map);
+			});
+
+			map.on('mouseenter', 'objects-far', function(e){
+				map.getCanvas().style.cursor = 'pointer';
+				
+				var coordinates = e.features[0].geometry.coordinates.slice();
+				var title = e.features[0].properties.title;
+								
+				popup.setLngLat(coordinates)
+					.setText(title)
+					.addTo(map);
+			});
+
+			function removePopup(){
+				map.getCanvas().style.cursor = '';
+				popup.remove();
+			}
+			
+			map.on('mouseleave', 'objects-area', function(){
+				removePopup();
+			});
+
+			map.on('mouseleave', 'objects-far', function(){
+				removePopup();
+			});
+
+			let card = document.querySelector('.card'),
+				closeCard = document.querySelector('.card-close'),
+				colAlt = "#06f",
+				selectedTitle,
+				data = d3.json('/objects/objects-far.geojson').then((err, data) => {
+					if (err) throw err;
+					return data;
+				});
+
+			console.log(data);
+
+			function selObj(e){
+				selectedTitle = e.features[0].properties.title;
+
+				map.getSource('objects-far').setData({
+
+				});
+			}
+
+			function selectObj(e){
+				selectedTitle = e.features[0].properties.title;
+
+				function queryFeature(id, layer){
+					return map.querySourceFeatures(id, {
+						sourceLayer: layer,
+						filter: ['==', 'title', selectedTitle]
+					});
+				}
+
+				let featuresFar = queryFeature('objects-far', 'objects-far'),
+					featuresArea = queryFeature('objects-area', 'objects-area'),
+					featuresStroke = queryFeature('objects-stroke', 'objects-area'),
+					featuresClose = queryFeature('objects-close', 'objects-close');
+				console.log(selectedTitle);
+				console.log(featuresFar);
+				console.log(featuresArea);
+				console.log(featuresStroke);
+				console.log(featuresClose);
+				// if(!featuresFar.length) return;
+				if(typeof map.getLayer('selectedFar') !== 'undefined'){
+					map.removeLayer('selectedFar');
+					map.removeSource('selectedFar');
+				}
+				if(typeof map.getLayer('selectedArea') !== 'undefined'){
+					map.removeLayer('selectedArea');
+					map.removeSource('selectedArea');
+				}
+				if(typeof map.getLayer('selectedStroke') !== 'undefined'){
+					map.removeLayer('selectedStroke');
+					map.removeSource('selectedStroke');
+				}
+				if(typeof map.getLayer('selectedClose') !== 'undefined'){
+					map.removeLayer('selectedClose');
+					map.removeSource('selectedClose');
+				}
+				let featureFar = {"type": "FeatureCollection","features":[]},
+					featureArea = {"type": "FeatureCollection","features":[]},
+					featureStroke = {"type": "FeatureCollection","features":[]},
+					featureClose = {"type": "FeatureCollection","features":[]};
+				featuresFar.forEach(feature => featureFar.features.push(feature));
+				featuresArea.forEach(feature => featureArea.features.push(feature));
+				featuresStroke.forEach(feature => featureStroke.features.push(feature));
+				featuresClose.forEach(feature => featureClose.features.push(feature));
+				console.log(featureFar);
+				console.log(featureArea);
+				console.log(featureStroke);
+				console.log(featureClose);
+				//console.log(featureFar.toJSON());
+				map.addSource('selectedFar', {
+					"type": "geojson",
+					"data": featureFar
+				});
+				map.addLayer({
+					"id": "selectedFar",
+					"type": "circle",
+					"maxzoom": 15.25,
+					"source": "selectedFar",
+					"paint": {
+						"circle-radius": [
+							"interpolate", ["linear"], ["zoom"],
+							10, 1, 22, 20,
+						],
+						"circle-color": colAlt,
+						"circle-opacity": 0.8
+					}
+				});
+				map.addSource('selectedArea', {
+					"type": "geojson",
+					"data": featureArea
+				});
+				map.addLayer({
+					"id": "selectedArea",
+					"type": "fill",
+					"minzoom": 15.25,
+					"source": "selectedArea",
+					"paint": {
+						'fill-color': colAlt,
+						"fill-opacity": 0.4
+					}
+				});
+				map.addSource('selectedStroke', {
+					"type": "geojson",
+					"data": featureStroke
+				});
+				map.addLayer({
+					"id": "selectedStroke",
+					"type": "line",
+					"minzoom": 15.25,
+					"source": "selectedStroke",
+					"paint": {
+						'line-color': colAlt,
+						'line-width': 3
+					}
+				});
+				map.addSource('selectedClose', {
+					"type": "geojson",
+					"data": featureClose
+				});
+				map.addLayer({
+					"id": "selectedClose",
+					"type": "fill-extrusion",
+					"minzoom": 15.25,
+					"source": "selectedClose",
+					"paint": {
+						'fill-extrusion-color': colAlt,
+						'fill-extrusion-height': ['get', 'height'],
+						'fill-extrusion-base': ['get', 'base_height'],
+						'fill-extrusion-opacity': 0.8
+					}
+				});
+			}
+
+			map.on('click', 'objects-far', function(e){
+				card.classList.add('active');
+
+				let city = e.features[0].properties["city-ua"],
+					district = e.features[0].properties["district-ua"],
+					title = e.features[0].properties["title"],
+					img = e.features[0].properties["image"],
+					metro = e.features[0].properties["station"],
+					walk = e.features[0].properties["walk-time"];
+
+				document.querySelector('.card-location').innerHTML = city + ', ' + district;
+				document.querySelector('.card-title').innerHTML = title;
+				document.querySelector('.card-image').src = img;
+				document.querySelector('.card-direction-label').innerHTML = metro;
+				document.querySelector('.card-walk').innerHTML = walk + 'min';
+
+				// Change color
+				selectObj(e);
+			});
+
+			map.on('click', 'objects-area', function(e){
+				card.classList.add('active');
+
+				let city = e.features[0].properties["city-ua"],
+					district = e.features[0].properties["district-ua"],
+					title = e.features[0].properties["title"],
+					img = e.features[0].properties["image"],
+					metro = e.features[0].properties["station"],
+					walk = e.features[0].properties["walk-time"];
+				document.querySelector('.card-location').innerHTML = city + ', ' + district;
+				document.querySelector('.card-title').innerHTML = title;
+				document.querySelector('.card-image').src = img;
+				document.querySelector('.card-direction-label').innerHTML = metro;
+				document.querySelector('.card-walk').innerHTML = walk + 'min';
+
+				// Change color
+				selectObj(e);
+			});
+
+			closeCard.addEventListener('click', function(){
+				card.classList.remove('active');
+				map.removeLayer('selectedObj');
+				map.removeSource('selectedObj');
+			});
+
+			// Filter
+			let	cancelled = false,
+				completed = false;
+
+			let filtArr = ["all"];
+
+			document.querySelector('.filter').addEventListener('click', e => {
+				let targetId = e.target.id;
+				let exist = false;
+				for(let i = 0; i < filtArr.length; i++){
+					if(filtArr[i].indexOf(targetId) !== -1){
+						exist = true;
+						filtArr.splice(i, 1);
+					}
+				}
+				if(!exist) filtArr.push(["!=", "state", targetId]);
+				console.log(filtArr);
+				map.setFilter("objects-far", filtArr);
+				map.setFilter("objects-close", filtArr);
+				map.setFilter("objects-area", filtArr);
+				map.setFilter("objects-area-stroke", filtArr);
+				map.setFilter("selectedObj", filtArr);
+			});
+		});
+	</script>
+</body>
+</html>
+
+

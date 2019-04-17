@@ -1,0 +1,336 @@
+body {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+	color: #666;
+}
+
+a {
+	color: #1C629C;
+	text-decoration: none;
+}
+a:hover {
+    color: #06a1ea;
+}
+
+/* MAP */
+.title {
+	position: absolute;
+	top: 50px;
+	z-index: 2;
+	width: 100%;
+	font: bold 30px sans-serif;
+	color: cadetblue;
+	mix-blend-mode: difference;
+	text-align: center;
+}
+#map {
+	width: 100vw;
+	height: 100vh;
+}
+.mapboxgl-popup {
+	pointer-events: none;
+}
+.pop-up-txt {
+	margin: 0;
+	font: bold 14px/16px "Open Sans", sans-serif;
+	color: #666;
+}
+.mapboxgl-popup-content {
+	padding: 5px 10px;
+	pointer-events: none;
+}
+/* END OF MAP */
+
+.button, svg {
+    vertical-align: top;
+}
+
+.button {
+    display: inline-flex;
+    padding: 8px 12px;
+    background: none;
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.2);
+    border-radius: 2px;
+    border: none;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: Roboto, sans-serif;
+    line-height: 1.6;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .2s ease-in-out;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    display: block;
+	position: absolute;
+	top: 118px;
+	left: 20px;
+	z-index: 1;
+    width: 300px;
+	background: #fff;
+	border-radius: 3px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+    overflow: hidden;
+    color: #282828;
+    transform: rotateY(-90deg);
+    transform-origin: left;
+    transition: all .4s ease-in-out;
+}
+
+.card.active {
+	transform: rotateY(0);
+}
+
+.card-close {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 1;
+	width: 25px;
+	height: 25px;
+	border: none;
+	background: rgba(0,0,0,.3);
+	cursor: pointer;
+}
+.card-close::before,
+.card-close::after {
+	content: '';
+	position: absolute;
+	top: 6px;
+	width: 2px;
+	height: 18px;
+	background: #fff;
+	transform-origin: top;
+}
+.card-close::before {
+	left: 5px;
+	transform: rotate(-45deg);
+}
+.card-close::after {
+	right: 5px;
+	transform: rotate(45deg);
+}
+
+.card-media {
+	position: relative;
+	display: block;
+}
+
+.card-image {
+	width: 300px;
+}
+
+.card-media .card-content {
+	position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: #fff;
+    padding-top: 15%;
+    background: linear-gradient(transparent,#000);
+}
+
+.card-direction, .card-location {
+    margin-bottom: 6px;
+}
+
+.card-title {
+	margin-bottom: 6px;
+    color: #fff;
+    white-space: normal;
+    font-size: 20px;
+	line-height: 1.23;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.card-direction {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    white-space: nowrap;
+}
+.card-direction:last-child {
+    margin-bottom: 0;
+}
+
+.card-direction .ico {
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+    flex-shrink: 0;
+}
+.card-direction .ico:not(:first-child) {
+    width: 16px;
+    height: 16px;
+    margin-right: 2px;
+    position: relative;
+    top: -1px;
+    fill: currentColor;
+}
+
+.card-direction-label,
+.card-walk {
+    margin-right: 4px;
+    overflow: hidden;
+    flex-shrink: 1;
+    text-overflow: ellipsis;
+}
+
+.card-content {
+    position: relative;
+    padding: 16px;
+    font-size: 13px;
+}
+
+.card-price {
+    margin-bottom: 4px;
+    padding-right: 36px;
+    font-size: 15px;
+    text-transform: lowercase;
+}
+
+.card-text {
+    margin-bottom: 6px;
+    color: grey;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-actions {
+    position: relative;
+    height: 22px;
+    line-height: 22px;
+    padding-right: 36px;
+}
+.card-actions a {
+    display: inline-block;
+    vertical-align: top;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.button.-icon {
+    padding: 8px;
+    border-radius: 50%;
+    box-shadow: none;
+    color: #505050;
+}
+.card .favorite {
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.filter {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    display: flex;
+    justify-content: space-between;
+    width: 350px;
+}
+
+#red, #green {
+    padding: 5px 15px;
+    border: 1px solid #000;
+    border-radius: 5px;
+    background: linear-gradient(to top, #ccc, #fff);
+    cursor: pointer;
+    transition: all .3s;
+}
+
+#red:hover, #green:hover {
+    background: linear-gradient(to top, #999, #fff);
+}
+
+/* Drawing page */
+#drawFlat {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#drawFlat polygon {
+    fill: rgba(0,0,0,.2);
+    cursor: pointer;
+    transition: all .4s;
+}
+
+#drawFlat polygon:hover {
+    fill: #1C629C;
+    fill-opacity: .5;
+}
+
+#drawFlat rect {
+    fill-opacity: 0;
+}
+
+#drawFlat circle {
+    fill: red;
+}
+
+form {
+    display: inline-block;
+    margin: 25px 50px;
+}
+
+label {
+    cursor: pointer;
+}
+
+input {
+    display: block;
+    margin: 15px 0;
+    padding: 5px;
+    width: 500px;
+}
+
+/* Plan page */
+.subtitle {
+    padding: 100px 50px 10px;
+    font: bold 24px/1.2 sans-serif;
+}
+
+.plan-wr {
+    position: relative;
+    margin-left: 50px;
+    width: 1000px;
+    text-align: center;
+}
+
+.plan {
+    max-width: 100%;
+}
+
+.canvas-container {
+    position: absolute!important;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#floor {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.canvas-container #floor {
+    transform: none;
+}

@@ -1,0 +1,95 @@
+{
+	'type': 'FeatureCollection',
+	'features': [
+		{
+			'type': 'Feature',
+			'properties': {
+				"name": "Area",
+				"height": 0,
+				"base_height": 0,
+				"color": "#1C629C",
+				'description': '<img src="img/obozrevatel-err.png" />'
+			},
+			'geometry': {
+				'type': 'Polygon',
+				'coordinates': [[[30.545095, 50.437256],
+					[30.545331, 50.437255],
+					[30.545329, 50.437485],
+					[30.545095, 50.437483],
+					[30.545095, 50.437256]]]
+			}
+		},
+		{
+			"type": "Feature",
+			"properties": {
+				"name": "Complete house",
+				"height": 10,
+				"base_height": 0,
+				"color": "green",
+				'description': '<img src="img/obozrevatel-err.png" />'
+			},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [[[30.545132, 50.437282],
+					[30.545148, 50.437337],
+					[30.545191, 50.437343],
+					[30.545191, 50.437296],
+					[30.545132, 50.437282]]]
+			}
+		},
+		{
+			"type": "Feature",
+			"properties": {
+				"name": "In process bottom",
+				"height": 5,
+				"base_height": 0,
+				"color": "green",
+				'description': '<img src="img/obozrevatel-err.png" />'
+			},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [[[30.545314, 50.437354],
+					[30.545314, 50.437278],
+					[30.545250, 50.437292],
+					[30.545261, 50.437364],
+					[30.545314, 50.437354]]]
+			}
+		},
+		{
+			"type": "Feature",
+			"properties": {
+				"name": "In process top",
+				"height": 13,
+				"base_height": 5,
+				"color": "orange",
+				'description': '<img src="img/obozrevatel-err.png" />'
+			},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [[[30.545314, 50.437354],
+					[30.545314, 50.437278],
+					[30.545250, 50.437292],
+					[30.545261, 50.437364],
+					[30.545314, 50.437354]]]
+			}
+		},
+		{
+			"type": "Feature",
+			"properties": {
+				"name": "Planned",
+				"height": 50,
+				"base_height": 0,
+				"color": "orange",
+				'description': '<img src="img/obozrevatel-err.png" />'
+			},
+			"geometry": {
+				"type": "Polygon",
+				"coordinates": [[[30.545137, 50.437460],
+					[30.545255, 50.437453],
+					[30.545255, 50.437415],
+					[30.545143, 50.437422],
+					[30.545137, 50.437460]]]
+			}
+		}
+	]
+}

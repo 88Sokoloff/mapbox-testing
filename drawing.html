@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>OBOZ Canvas Test</title>
+	<link href='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+	<script src='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
+	<!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.0.12/svg.min.js'></script> -->
+	<script src="js/svg.min.js"></script>
+	<script src="js/svg.draw.js"></script>
+	<link rel="stylesheet" href="style/style.css">
+</head>
+<body>
+	<h1 class="title">OBOZ Drawing Testing</h1>
+
+	<h2 class="subtitle">Floor plan for drawing flat on it</h2>
+
+	<div class="plan-wr">
+		<img src="img/plan.png" alt="Plan of the floor" class="plan" />
+		<div id="drawFlat"></div>
+	</div>
+
+	<form action="#">
+		<label>Your points for SVG Polygon:
+			<input type="text" name="points" id="points" placeholder="Draw flat area on plan above &#x2B06;">
+		</label>
+	</form>
+
+	<script>
+		window.onload = function(){
+			let w = document.querySelector('.plan').clientWidth,
+				h = document.querySelector('.plan').clientHeight,
+				input = document.querySelector('input');
+
+			console.log(w, h);
+
+			document.querySelector('#drawFlat').width = w;
+			document.querySelector('#drawFlat').height = h;
+			
+			const flat = new SVG('drawFlat').size(w, h).polygon().draw();
+
+			flat.on('drawstart', e => {
+				document.addEventListener('keydown', e => {
+					if(e.keyCode == 13){
+						flat.draw('done');
+						flat.off('drawstart');
+					}
+				});
+			});
+
+			flat.on('drawstop', () => {
+				let polygon = document.querySelector('polygon');
+				input.value = polygon.getAttribute('points');
+				document.removeEventListener('keydown', e => {
+					if(e.keyCode == 13){
+						flat.draw('done');
+						flat.off('drawstart');
+					}
+				});
+			});
+		}
+	</script>
+</body>
+</html>
