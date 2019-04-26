@@ -4,85 +4,6 @@
       "type": "Feature",
       "properties": {
         "district-ru": "Печерский",
-        "color": "rgb(229, 11, 47)",
-        "obj-page": "https://www.obozrevatel.com/ukr/",
-        "city-ru": "Киев",
-        "price": "продажи не начнутся",
-        "developer": "ObozDomDevelopment",
-        "district-ua": "Печерський",
-        "city-ua": "Київ",
-        "walk-time": 10,
-        "state": "cancel",
-        "station": "Arsenalna",
-        "title": "Arsenal House",
-        "image": "img/object2.jpg"
-      },
-      "geometry": {
-        "coordinates": [
-          30.543621,
-          50.438816
-        ],
-        "type": "Point"
-      },
-      "id": "2988c1a3b3d57e623ef6dea339cc4b92"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "district-ru": "Печерский",
-        "color": "orange",
-        "obj-page": "https://www.obozrevatel.com/ukr/",
-        "city-ru": "Киев",
-        "price": "продажи не начнутся",
-        "developer": "VylaDevelopment",
-        "district-ua": "Печерський",
-        "city-ua": "Київ",
-        "walk-time": 5,
-        "state": "process",
-        "station": "Arsenalna",
-        "title": "Liashko Luxury Residence",
-        "image": "img/object3.jpg"
-      },
-      "geometry": {
-        "coordinates": [
-          30.540172,
-          50.44669
-        ],
-        "type": "Point"
-      },
-      "id": "49a24dc91ff10b9696ec51352c715c5f"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "district-ru": "Печерский",
-        "color": "orange",
-        "obj-page": "Київ",
-        "city-ru": "Киев",
-        "price": 15000,
-        "developer": "ObozDomDevelopment",
-        "district-ua": "Печерський",
-        "city-ua": "Київ",
-        "walk-time": 13,
-        "state": "process",
-        "station": "Arsenalna",
-        "title": "Lavra House",
-        "image": "img/object1.jpg"
-      },
-      "geometry": {
-        "coordinates": [
-          30.550537,
-          50.441567
-        ],
-        "type": "Point"
-      },
-      "id": "642cc4a11adb73f80f561ab2e9e36487"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "district-ru": "Печерский",
-        "color": "green",
         "obj-page": "https://www.obozrevatel.com/ukr/",
         "city-ru": "Киев",
         "price": "продажи не начнутся",
@@ -92,8 +13,10 @@
         "walk-time": 13,
         "state": "complete",
         "station": "Arsenalna",
-        "image": "img/object1.jpg",
-        "title": "Oboz Secret Base"
+        "class": "elite",
+        "title": "Oboz Secret Base",
+        "parking": "underground",
+        "image": "img/object1.jpg"
       },
       "geometry": {
         "coordinates": [
@@ -102,7 +25,116 @@
         ],
         "type": "Point"
       },
-      "id": "a2641d7167ef7be141e3da4dee68a8e2"
+      "id": "111"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district-ru": "Печерский",
+        "obj-page": "https://www.obozrevatel.com/ukr/",
+        "city-ru": "Киев",
+        "price": "продажи не начнутся",
+        "developer": "ObozDomDevelopment",
+        "district-ua": "Печерський",
+        "city-ua": "Київ",
+        "walk-time": 13,
+        "state": "complete",
+        "station": "Arsenalna",
+        "class": "econom",
+        "title": "Bizol Complex",
+        "parking": "underground",
+        "image": "img/object1.jpg"
+      },
+      "geometry": {
+        "coordinates": [
+          30.546835,
+          50.440592
+        ],
+        "type": "Point"
+      },
+      "id": "1e27dc87d7e28b95517d670ac1feb5b6"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district-ru": "Печерский2",
+        "color": "warning",
+        "obj-page": "https://www.obozrevatel.com/ukr/",
+        "city-ru": "Киев",
+        "price": "продажи не начнутся",
+        "developer": "ObozDomDevelopment",
+        "district-ua": "Печерський",
+        "city-ua": "Київ",
+        "walk-time": 10,
+        "state": "cancel",
+        "station": "Arsenalna",
+        "class": "econom",
+        "title": "Arsenal House",
+        "parking": "underground",
+        "image": "img/object2.jpg"
+      },
+      "geometry": {
+        "coordinates": [
+          30.543621,
+          50.438816
+        ],
+        "type": "Point"
+      },
+      "id": "222"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district-ru": "Печерский",
+        "obj-page": "https://www.obozrevatel.com/ukr/",
+        "city-ru": "Киев",
+        "price": "продажи не начнутся",
+        "developer": "VylaDevelopment",
+        "district-ua": "Печерський",
+        "city-ua": "Київ",
+        "walk-time": 5,
+        "state": "process",
+        "station": "Arsenalna",
+        "class": "elite",
+        "title": "Liashko Mariinsky Complex",
+        "parking": "open",
+        "image": "img/object3.jpg"
+      },
+      "geometry": {
+        "coordinates": [
+          30.540172,
+          50.44669
+        ],
+        "type": "Point"
+      },
+      "id": "333"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "district-ru": "Печерский",
+        "obj-page": "Київ",
+        "city-ru": "Киев",
+        "price": 15000,
+        "developer": "ObozDomDevelopment",
+        "district-ua": "Печерський",
+        "city-ua": "Київ",
+        "walk-time": 13,
+        "state": "process",
+        "station": "Arsenalna",
+        "class": "elite",
+        "title": "Lavra House",
+        "parking": "open",
+        "image": "img/object1.jpg"
+      },
+      "geometry": {
+        "coordinates": [
+          30.550537,
+          50.441567
+        ],
+        "type": "Point"
+      },
+      "id": "444"
     }
   ],
   "type": "FeatureCollection"

@@ -14,8 +14,11 @@
 	<div id="map"></div>
 
 	<div class="filter">
-		<button id="cancel">Hide/show cancelled</button>
-		<button id="complete">Hide/show completed</button>
+		<button id="cancel" class="filter-btn">Hide/show cancelled</button>
+		<button id="complete" class="filter-btn">Hide/show completed</button>
+
+		<button id="elite" class="filter-btn">Elite</button>
+		<button id="parking" class="filter-btn">Parking</button>
 	</div>
 	
 	<!-- Card of the object -->
@@ -68,8 +71,14 @@
 			compact: true
 		}));
 
-		map.on('load', function() {
-			map.setLight({color: "white", intensity: 0.6, position: [1.15, 135, 45]});
+		map.on('load', () => {
+
+			let warningColor = '#f18084',
+				mainColor = '#ff9800',
+				lightColor = '#ffc773',
+				selectedColor = '#6688bb',
+				selectedLightColor = '#abbeda',
+				disabledColor = '#cacaca';
 
 			map.addSource('objects-far', {
 				'type': 'vector',
@@ -89,45 +98,69 @@
 			map.addLayer({
 				'id': 'objects-area',
 				'type': 'fill',
-				'minzoom': 15.25,
 				'source': 'objects-area',
 				"source-layer": "objects-area",
 				'paint': {
-					'fill-color': ['get', "color"],
-					"fill-opacity": 0.4
+					'fill-color': ["case",
+						["==", ["get", "color"], "warning"],
+						warningColor,
+						["==", ["get", "color"], "muted"],
+						disabledColor,
+						["==", ["get", "color"], "light"],
+						lightColor,
+						mainColor],
+					"fill-opacity": {
+						"stops": [[15.24, 0], [15.25, 0.4]]
+					}
 				}
 			});
 
 			map.addLayer({
 				'id': 'objects-stroke',
 				'type': 'line',
-				'minzoom': 15.25,
 				'source': 'objects-area',
 				'source-layer': "objects-area",
 				'paint': {
-					'line-color': ['get', "color"],
-					'line-width': 3
+					'line-color': ["case",
+						["==", ["get", "color"], "warning"],
+						warningColor,
+						["==", ["get", "color"], "muted"],
+						disabledColor,
+						["==", ["get", "color"], "light"],
+						lightColor,
+						mainColor],
+					'line-width': {
+						"stops": [[15.24, 0], [15.25, 3]]
+					}
 				}
 			});
 			
 			map.addLayer({
 				'id': 'objects-close',
 				'type': 'fill-extrusion',
-				'minzoom': 15.25,
 				'source': 'objects-close',
 				"source-layer": "objects-close",
 				'paint': {
-					'fill-extrusion-color': ['get', 'color'],
-					'fill-extrusion-height': ['get', 'height'],
-					'fill-extrusion-base': ['get', 'base_height'],
-					'fill-extrusion-opacity': 0.8
+					'fill-extrusion-color': ["case",
+						["==", ["get", "color"], "warning"],
+						warningColor,
+						["==", ["get", "color"], "muted"],
+						disabledColor,
+						["==", ["get", "color"], "light"],
+						lightColor,
+						mainColor],
+					'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 13, 0, 14, ['get', 'height']],
+					'fill-extrusion-base': 0,
+					'fill-extrusion-opacity': {
+						"stops": [[15.24, 0], [15.25, 0.9]]
+					},
+					'fill-extrusion-vertical-gradient': false
 				}
 			});
 
 			map.addLayer({
 				"id": "objects-far",
 				"type": "circle",
-				"maxzoom": 15.25,
 				"source": 'objects-far',
 				"source-layer": "objects-far",
 				"paint": {
@@ -135,12 +168,26 @@
 						"interpolate", ["linear"], ["zoom"],
 						10, 1, 22, 20,
 					],
-					"circle-color": ["get", "color"],
-					"circle-opacity": 0.8,
-					"circle-stroke-width": 1,
+					"circle-color": ["case",
+						["==", ["get", "color"], "warning"],
+						warningColor,
+						["==", ["get", "color"], "muted"],
+						disabledColor,
+						["==", ["get", "color"], "light"],
+						lightColor,
+						mainColor],
+					"circle-opacity": {
+						"stops": [[15.24, 0.8], [15.25, 0]]
+					},
+					"circle-stroke-width": {
+						"stops": [[15.24, 1], [15.25, 0]]
+					},
 					"circle-stroke-color": "#fff"
 				}
 			});
+
+			// Dont show red circles
+			map.setFilter("objects-far", ["!=", ["get", "color"], "warning"]);
 
 			// Create a popup, but don't add it to the map yet.
 			var popup = new mapboxgl.Popup({
@@ -150,6 +197,8 @@
 			});
 			
 			map.on('mouseenter', 'objects-area', function(e){
+				if(map.getZoom() < 15.24) return;
+
 				map.getCanvas().style.cursor = 'pointer';
 				
 				var coordinates = e.features[0].geometry.coordinates.slice();
@@ -162,6 +211,8 @@
 			});
 
 			map.on('mouseenter', 'objects-far', function(e){
+				if(map.getZoom() > 15.24) return;
+
 				map.getCanvas().style.cursor = 'pointer';
 				
 				var coordinates = e.features[0].geometry.coordinates.slice();
@@ -178,150 +229,59 @@
 			}
 			
 			map.on('mouseleave', 'objects-area', function(){
+				if(map.getZoom() <= 15.25) return;
 				removePopup();
 			});
 
 			map.on('mouseleave', 'objects-far', function(){
+				if(map.getZoom() > 15.25) return;
 				removePopup();
 			});
 
 			let card = document.querySelector('.card'),
 				closeCard = document.querySelector('.card-close'),
-				colAlt = "#06f",
-				selectedTitle,
-				data = d3.json('/objects/objects-far.geojson').then((err, data) => {
-					if (err) throw err;
-					return data;
-				});
-
-			console.log(data);
-
-			function selObj(e){
-				selectedTitle = e.features[0].properties.title;
-
-				map.getSource('objects-far').setData({
-
-				});
-			}
+				selectedTitle;
 
 			function selectObj(e){
 				selectedTitle = e.features[0].properties.title;
 
-				function queryFeature(id, layer){
-					return map.querySourceFeatures(id, {
-						sourceLayer: layer,
-						filter: ['==', 'title', selectedTitle]
-					});
-				}
+				const colorProps = ["case",
+						["==", ["get", "color"], "warning"],
+						warningColor,
+						["==", ["get", "color"], "muted"],
+						disabledColor,
+						["all", ["==", ["get", "title"], selectedTitle], ["==", ["get", "color"], "light"]],
+						selectedLightColor,
+						["==", ["get", "title"], selectedTitle],
+						selectedColor,
+						["==", ["get", "color"], "light"],
+						lightColor,
+						mainColor];
 
-				let featuresFar = queryFeature('objects-far', 'objects-far'),
-					featuresArea = queryFeature('objects-area', 'objects-area'),
-					featuresStroke = queryFeature('objects-stroke', 'objects-area'),
-					featuresClose = queryFeature('objects-close', 'objects-close');
-				console.log(selectedTitle);
-				console.log(featuresFar);
-				console.log(featuresArea);
-				console.log(featuresStroke);
-				console.log(featuresClose);
-				// if(!featuresFar.length) return;
-				if(typeof map.getLayer('selectedFar') !== 'undefined'){
-					map.removeLayer('selectedFar');
-					map.removeSource('selectedFar');
-				}
-				if(typeof map.getLayer('selectedArea') !== 'undefined'){
-					map.removeLayer('selectedArea');
-					map.removeSource('selectedArea');
-				}
-				if(typeof map.getLayer('selectedStroke') !== 'undefined'){
-					map.removeLayer('selectedStroke');
-					map.removeSource('selectedStroke');
-				}
-				if(typeof map.getLayer('selectedClose') !== 'undefined'){
-					map.removeLayer('selectedClose');
-					map.removeSource('selectedClose');
-				}
-				let featureFar = {"type": "FeatureCollection","features":[]},
-					featureArea = {"type": "FeatureCollection","features":[]},
-					featureStroke = {"type": "FeatureCollection","features":[]},
-					featureClose = {"type": "FeatureCollection","features":[]};
-				featuresFar.forEach(feature => featureFar.features.push(feature));
-				featuresArea.forEach(feature => featureArea.features.push(feature));
-				featuresStroke.forEach(feature => featureStroke.features.push(feature));
-				featuresClose.forEach(feature => featureClose.features.push(feature));
-				console.log(featureFar);
-				console.log(featureArea);
-				console.log(featureStroke);
-				console.log(featureClose);
-				//console.log(featureFar.toJSON());
-				map.addSource('selectedFar', {
-					"type": "geojson",
-					"data": featureFar
-				});
-				map.addLayer({
-					"id": "selectedFar",
-					"type": "circle",
-					"maxzoom": 15.25,
-					"source": "selectedFar",
-					"paint": {
-						"circle-radius": [
-							"interpolate", ["linear"], ["zoom"],
-							10, 1, 22, 20,
-						],
-						"circle-color": colAlt,
-						"circle-opacity": 0.8
-					}
-				});
-				map.addSource('selectedArea', {
-					"type": "geojson",
-					"data": featureArea
-				});
-				map.addLayer({
-					"id": "selectedArea",
-					"type": "fill",
-					"minzoom": 15.25,
-					"source": "selectedArea",
-					"paint": {
-						'fill-color': colAlt,
-						"fill-opacity": 0.4
-					}
-				});
-				map.addSource('selectedStroke', {
-					"type": "geojson",
-					"data": featureStroke
-				});
-				map.addLayer({
-					"id": "selectedStroke",
-					"type": "line",
-					"minzoom": 15.25,
-					"source": "selectedStroke",
-					"paint": {
-						'line-color': colAlt,
-						'line-width': 3
-					}
-				});
-				map.addSource('selectedClose', {
-					"type": "geojson",
-					"data": featureClose
-				});
-				map.addLayer({
-					"id": "selectedClose",
-					"type": "fill-extrusion",
-					"minzoom": 15.25,
-					"source": "selectedClose",
-					"paint": {
-						'fill-extrusion-color': colAlt,
-						'fill-extrusion-height': ['get', 'height'],
-						'fill-extrusion-base': ['get', 'base_height'],
-						'fill-extrusion-opacity': 0.8
-					}
-				});
+				const colorAreaProps = ["case",
+						["all",
+							["==", ["get", "title"], selectedTitle],
+							["==", ["get", "color"], "light"]],
+						selectedLightColor,
+						["==", ["get", "title"], selectedTitle],
+						selectedColor,
+						["==", ["get", "color"], "warning"],
+						warningColor,
+						["==", ["get", "color"], "muted"],
+						disabledColor,
+						["==", ["get", "color"], "light"],
+						lightColor,
+						mainColor];
+
+				map.setPaintProperty('objects-far', 'circle-color', colorProps);
+				map.setPaintProperty('objects-area', 'fill-color', colorAreaProps);
+				map.setPaintProperty('objects-stroke', 'line-color', colorAreaProps);
+				map.setPaintProperty('objects-close', 'fill-extrusion-color', colorProps);
 			}
 
-			map.on('click', 'objects-far', function(e){
-				card.classList.add('active');
-
+			function fillCard(e){
 				let city = e.features[0].properties["city-ua"],
-					district = e.features[0].properties["district-ua"],
+					district = e.features[0].properties["district-ru"],
 					title = e.features[0].properties["title"],
 					img = e.features[0].properties["image"],
 					metro = e.features[0].properties["station"],
@@ -332,25 +292,23 @@
 				document.querySelector('.card-image').src = img;
 				document.querySelector('.card-direction-label').innerHTML = metro;
 				document.querySelector('.card-walk').innerHTML = walk + 'min';
+
+				card.classList.add('active');
+			}
+
+			map.on('click', 'objects-far', function(e){
+				if(map.getZoom() >= 15.25) return;
+
+				fillCard(e);
 
 				// Change color
 				selectObj(e);
 			});
 
 			map.on('click', 'objects-area', function(e){
-				card.classList.add('active');
+				if(map.getZoom() < 15.25) return;
 
-				let city = e.features[0].properties["city-ua"],
-					district = e.features[0].properties["district-ua"],
-					title = e.features[0].properties["title"],
-					img = e.features[0].properties["image"],
-					metro = e.features[0].properties["station"],
-					walk = e.features[0].properties["walk-time"];
-				document.querySelector('.card-location').innerHTML = city + ', ' + district;
-				document.querySelector('.card-title').innerHTML = title;
-				document.querySelector('.card-image').src = img;
-				document.querySelector('.card-direction-label').innerHTML = metro;
-				document.querySelector('.card-walk').innerHTML = walk + 'min';
+				fillCard(e);
 
 				// Change color
 				selectObj(e);
@@ -358,8 +316,10 @@
 
 			closeCard.addEventListener('click', function(){
 				card.classList.remove('active');
-				map.removeLayer('selectedObj');
-				map.removeSource('selectedObj');
+				map.setFilter('objects-far', ['all']);
+				map.setFilter('objects-area', ['all']);
+				map.setFilter('objects-stroke', ['all']);
+				map.setFilter('objects-close', ['all']);
 			});
 
 			// Filter
@@ -378,16 +338,13 @@
 					}
 				}
 				if(!exist) filtArr.push(["!=", "state", targetId]);
-				console.log(filtArr);
+				
 				map.setFilter("objects-far", filtArr);
 				map.setFilter("objects-close", filtArr);
 				map.setFilter("objects-area", filtArr);
-				map.setFilter("objects-area-stroke", filtArr);
-				map.setFilter("selectedObj", filtArr);
+				map.setFilter("objects-stroke", filtArr);
 			});
 		});
 	</script>
 </body>
 </html>
-
-

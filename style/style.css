@@ -41,6 +41,7 @@ a:hover {
 	padding: 5px 10px;
 	pointer-events: none;
 }
+
 /* END OF MAP */
 
 .button, svg {
@@ -240,8 +241,26 @@ a:hover {
     top: 25px;
     right: 25px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    flex-wrap: wrap;
     width: 350px;
+    z-index: 2;
+}
+
+.filter-btn {
+    margin: 10px;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #eee;
+    cursor: pointer;
+    transition: all .3s ease-out;
+}
+.filter-btn:hover {
+    box-shadow: 0 0 2px 0 #000;
+}
+.filter-btn.active{
+    background: #cacaca;
 }
 
 #red, #green {
