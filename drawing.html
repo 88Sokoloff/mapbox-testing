@@ -4,59 +4,397 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>OBOZ Canvas Test</title>
-	<link href='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+	<title>OBOZ Drawing Test</title>
 	<script src='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
-	<!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.0.12/svg.min.js'></script> -->
+	<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.js'></script>
 	<script src="js/svg.min.js"></script>
 	<script src="js/svg.draw.js"></script>
+	<link href='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+	<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.css' type='text/css'/>
 	<link rel="stylesheet" href="style/style.css">
 </head>
+
 <body>
 	<h1 class="title">OBOZ Drawing Testing</h1>
 
-	<h2 class="subtitle">Floor plan for drawing flat on it</h2>
+	<div class="field-wrapper">
+		<div class="top-map-wr">
+			<div id="initMap"></div>
+			<img src="img/plan.png" alt="Plan of the floor" class="plan-on-map" />	
+		</div>
 
-	<div class="plan-wr">
-		<img src="img/plan.png" alt="Plan of the floor" class="plan" />
-		<div id="drawFlat"></div>
+		<p class="map-info">Zoom level: <span class="map-zoom"></span><br>Angle from North Pole: <span class="map-angle"></span><br><br>Angle of your line: <span class="map-line"></span></p>
+		
+		<div class="plan-svg">
+			<h2 class="subtitle">Floor plan for choosing dots on it</h2>
+
+			<div class="plan-wr">
+				<img src="img/plan.png" alt="Plan of the floor" class="plan" />
+				<div id="chooseDots"></div>
+			</div>
+		
+			<form action="#">
+				<label>Your dots for SVG Polygon:
+					<input type="text" name="dots" id="dots" placeholder="Insert dots on plan above &#x2B06;">
+				</label>
+			</form>
+		</div>
+
+		<div class="plan-svg">
+			<h2 class="subtitle">Floor plan for drawing flat on it</h2>
+
+			<div class="plan-wr">
+				<img src="img/plan.png" alt="Plan of the floor" class="plan" />
+				<div id="drawFlat"></div>
+			</div>
+		
+			<form action="#">
+				<label>Your points for SVG Polygon:
+					<input type="text" name="points" id="points" placeholder="Draw flat area on plan above &#x2B06;">
+				</label>
+			</form>
+		</div>
+
+		<div id="outputFlat"></div>
 	</div>
-
-	<form action="#">
-		<label>Your points for SVG Polygon:
-			<input type="text" name="points" id="points" placeholder="Draw flat area on plan above &#x2B06;">
-		</label>
-	</form>
 
 	<script>
 		window.onload = function(){
+
+			const	warningColor = '#f18084',
+					mainColor = '#ff9800',
+					lightColor = '#ffc773',
+					selectedColor = '#6688bb',
+					selectedLightColor = '#abbeda',
+					disabledColor = '#cacaca',
+					unfilterededColor = '#cbcbcb';
+
+			// Initial map
+			mapboxgl.accessToken = 'pk.eyJ1IjoiODhzb2tvbG9mZiIsImEiOiJjanN3d2tzZncwZW40NDRvZnVhYjFzNWdmIn0.pKR58x1O09IftAYhGgtRrA';
+			var map = new mapboxgl.Map({
+				container: 'initMap',
+				attributionControl: false,
+				style: 'mapbox://styles/88sokoloff/cjth19wu40jxi1fjywl6mzyut?optimize=true',
+				center: [30.544065, 50.438809],
+				zoom: 17.6,
+				minZoom: 8
+			});
+
+			map.dragRotate._pitchWithRotate = false;
+
+			map.on('load', () => {
+				map.addSource('objects-area', {
+					'type': 'vector',
+					'url': 'mapbox://88sokoloff.cjub9cs4n02x32rs8mh4bu8u6-191pp'
+				});
+
+				map.addSource('objects-close', {
+					'type': 'vector',
+					'url': 'mapbox://88sokoloff.cjtfvdyrb097p2sp3we9a37w8-6vnh0'
+				});
+
+				map.addLayer({
+					'id': 'objects-area',
+					'type': 'fill',
+					'source': 'objects-area',
+					"source-layer": "objects-area",
+					'filter': ["==", "title", "Arsenal House"],
+					'paint': {
+						'fill-color': ["case",
+							["==", ["get", "color"], "warning"],
+							warningColor,
+							["==", ["get", "color"], "muted"],
+							disabledColor,
+							["==", ["get", "color"], "light"],
+							lightColor,
+							mainColor],
+						"fill-opacity": 0.4
+					}
+				});
+
+				map.addLayer({
+					'id': 'objects-stroke',
+					'type': 'line',
+					'source': 'objects-area',
+					'source-layer': "objects-area",
+					'filter': ["==", "title", "Arsenal House"],
+					'paint': {
+						'line-color': ["case",
+							["==", ["get", "color"], "warning"],
+							warningColor,
+							["==", ["get", "color"], "muted"],
+							disabledColor,
+							["==", ["get", "color"], "light"],
+							lightColor,
+							mainColor],
+						'line-width': 2
+					}
+				});
+				
+				map.addLayer({
+					'id': 'objects-close',
+					'type': 'fill',
+					'source': 'objects-close',
+					"source-layer": "objects-close",
+					'filter': ["==", "title", "Arsenal House"],
+					'paint': {
+						'fill-color': ["case",
+							["==", ["get", "color"], "warning"],
+							warningColor,
+							["==", ["get", "color"], "muted"],
+							disabledColor,
+							["==", ["get", "color"], "light"],
+							lightColor,
+							mainColor],
+						'fill-opacity': 0.9
+					}
+				});
+
+				map.addLayer({
+					'id': 'objects-close-stroke',
+					'type': 'line',
+					'source': 'objects-close',
+					"source-layer": "objects-close",
+					'filter': ["==", "title", "Arsenal House"],
+					'paint': {
+						'line-color': ["case",
+							["==", ["get", "color"], "warning"],
+							warningColor,
+							["==", ["get", "color"], "muted"],
+							disabledColor,
+							["==", ["get", "color"], "light"],
+							lightColor,
+							mainColor],
+						'line-width': 2
+					}
+				});
+
+				document.querySelector('.map-zoom').innerHTML = map.getZoom();
+
+				document.querySelector('.map-angle').innerHTML = map.getBearing() + 'deg';
+			});
+
+			map.on('zoom', () => {
+				document.querySelector('.map-zoom').innerHTML = map.getZoom().toFixed(2);
+			});
+
+			map.on('rotate', () => {
+				document.querySelector('.map-angle').innerHTML = map.getBearing().toFixed(2) + 'deg';
+			});
+
+			var draw = new MapboxDraw({
+				displayControlsDefault: false,
+				controls: {
+					point: true,
+					polygon: true,
+					trash: true
+				}
+			});
+			map.addControl(draw, 'bottom-left');
+
+			map.on('draw.create', updateArea);
+			map.on('draw.delete', updateArea);
+			map.on('draw.update', updateArea);
+
+			let drawData,
+				flatDrawn = false,
+				pointsCoord = [];
+							
+			function updateArea(e) {
+				drawData = draw.getAll();
+				console.log(drawData.features);
+				if(e.type == 'draw.delete' && outMap.getLayer('flat')){
+					outMap.removeLayer('flat');
+					outMap.removeSource('flat');
+					flatDrawn = false;
+					return;
+				}
+				pointsCoord = [];
+				drawData.features.forEach(feature => {
+					if(feature.geometry.type == 'Polygon' && flatDrawn === false){
+						outMap.addLayer({
+							'id': 'flat',
+							'type': 'fill',
+							'source': {
+								'type': 'geojson',
+								'data': feature
+							},
+							'paint': {
+								'fill-color': 'green'
+							}
+						});
+						flatDrawn = true;
+					}
+					if(feature.geometry.type == 'Point') {
+						pointsCoord.push(feature.geometry.coordinates);
+					}
+				});
+				if(pointsCoord.length >= 2){
+					getAngle();
+				}
+			}
+
+			function getAngle(){
+				let lat1 = pointsCoord[0][1] * Math.PI / 180,
+					lat2 = pointsCoord[1][1] * Math.PI / 180,
+					lon1 = pointsCoord[0][0] * Math.PI / 180,
+					lon2 = pointsCoord[1][0] * Math.PI / 180,
+					x = Math.log(Math.tan(lat2 / 2 + Math.PI / 4) / Math.tan(lat1 / 2 + Math.PI / 4)),
+					y = Math.abs(lon1 - lon2),
+					angle = Math.atan2(Math.sin(y) * Math.cos(lat2), Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(y));
+					
+				document.querySelector('.map-line').innerHTML = (angle * 180 / Math.PI).toFixed(2) + 'deg';
+			}
+
+			// SVG Draw
 			let w = document.querySelector('.plan').clientWidth,
 				h = document.querySelector('.plan').clientHeight,
-				input = document.querySelector('input');
+				points = document.querySelector('#points'),
+				dots = document.querySelector('#dots');
 
 			console.log(w, h);
 
 			document.querySelector('#drawFlat').width = w;
 			document.querySelector('#drawFlat').height = h;
 			
-			const flat = new SVG('drawFlat').size(w, h).polygon().draw();
+			const dotsSVG = new SVG('chooseDots').size(w, h).polygon().draw();
+			const flatSVG = new SVG('drawFlat').size(w, h).polygon().draw();
 
-			flat.on('drawstart', e => {
+			dotsSVG.on('drawstart', e => {
 				document.addEventListener('keydown', e => {
 					if(e.keyCode == 13){
-						flat.draw('done');
-						flat.off('drawstart');
+						dotsSVG.draw('done');
+						dotsSVG.off('drawstart');
 					}
 				});
 			});
 
-			flat.on('drawstop', () => {
+			dotsSVG.on('drawstop', () => {
 				let polygon = document.querySelector('polygon');
-				input.value = polygon.getAttribute('points');
+				dots.value = polygon.getAttribute('points');
 				document.removeEventListener('keydown', e => {
 					if(e.keyCode == 13){
-						flat.draw('done');
-						flat.off('drawstart');
+						dotsSVG.draw('done');
+						dotsSVG.off('drawstart');
+					}
+				});
+			});
+
+			flatSVG.on('drawstart', e => {
+				document.addEventListener('keydown', e => {
+					if(e.keyCode == 13){
+						flatSVG.draw('done');
+						flatSVG.off('drawstart');
+					}
+				});
+			});
+
+			flatSVG.on('drawstop', () => {
+				let polygon = document.querySelectorAll('polygon')[1];
+				points.value = polygon.getAttribute('points');
+				document.removeEventListener('keydown', e => {
+					if(e.keyCode == 13){
+						flatSVG.draw('done');
+						flatSVG.off('drawstart');
+					}
+				});
+			});
+
+			// Output Map
+			var outMap = new mapboxgl.Map({
+				container: 'outputFlat',
+				attributionControl: false,
+				style: 'mapbox://styles/88sokoloff/cjth19wu40jxi1fjywl6mzyut',
+				center: [30.544065, 50.438809],
+				zoom: 17.6,
+				minZoom: 8
+			});
+
+			outMap.on('load', () => {
+
+				outMap.addSource('objects-area', {
+					'type': 'vector',
+					'url': 'mapbox://88sokoloff.cjub9cs4n02x32rs8mh4bu8u6-191pp'
+				});
+
+				outMap.addSource('objects-close', {
+					'type': 'vector',
+					'url': 'mapbox://88sokoloff.cjtfvdyrb097p2sp3we9a37w8-6vnh0'
+				});
+
+				outMap.addLayer({
+					'id': 'objects-area',
+					'type': 'fill',
+					'source': 'objects-area',
+					"source-layer": "objects-area",
+					'filter': ["==", "title", "Arsenal House"],
+					'paint': {
+						'fill-color': ["case",
+							["==", ["get", "color"], "warning"],
+							warningColor,
+							["==", ["get", "color"], "muted"],
+							disabledColor,
+							["==", ["get", "color"], "light"],
+							lightColor,
+							mainColor],
+						"fill-opacity": 0.4
+					}
+				});
+
+				outMap.addLayer({
+					'id': 'objects-stroke',
+					'type': 'line',
+					'source': 'objects-area',
+					'source-layer': "objects-area",
+					'filter': ["==", "title", "Arsenal House"],
+					'paint': {
+						'line-color': ["case",
+							["==", ["get", "color"], "warning"],
+							warningColor,
+							["==", ["get", "color"], "muted"],
+							disabledColor,
+							["==", ["get", "color"], "light"],
+							lightColor,
+							mainColor],
+						'line-width': 2
+					}
+				});
+				
+				outMap.addLayer({
+					'id': 'objects-close',
+					'type': 'fill',
+					'source': 'objects-close',
+					"source-layer": "objects-close",
+					'filter': ["==", "title", "Arsenal House"],
+					'paint': {
+						'fill-color': ["case",
+							["==", ["get", "color"], "warning"],
+							warningColor,
+							["==", ["get", "color"], "muted"],
+							disabledColor,
+							["==", ["get", "color"], "light"],
+							lightColor,
+							mainColor],
+						'fill-opacity': 0.9
+					}
+				});
+
+				outMap.addLayer({
+					'id': 'objects-close-stroke',
+					'type': 'line',
+					'source': 'objects-close',
+					"source-layer": "objects-close",
+					'filter': ["==", "title", "Arsenal House"],
+					'paint': {
+						'line-color': ["case",
+							["==", ["get", "color"], "warning"],
+							warningColor,
+							["==", ["get", "color"], "muted"],
+							disabledColor,
+							["==", ["get", "color"], "light"],
+							lightColor,
+							mainColor],
+						'line-width': 2
 					}
 				});
 			});

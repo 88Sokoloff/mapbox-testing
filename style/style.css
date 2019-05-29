@@ -17,7 +17,7 @@ a:hover {
 /* MAP */
 .title {
 	position: absolute;
-	top: 50px;
+	top: 15px;
 	z-index: 2;
 	width: 100%;
 	font: bold 30px sans-serif;
@@ -191,6 +191,17 @@ a:hover {
     font-size: 13px;
 }
 
+.card-content > .ico {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    cursor: pointer;
+}
+
+.card-content > .ico:hover {
+    fill: #666;
+}
+
 .card-price {
     margin-bottom: 4px;
     padding-right: 36px;
@@ -236,6 +247,7 @@ a:hover {
     cursor: pointer;
 }
 
+.hide,
 .filter {
     position: absolute;
     top: 25px;
@@ -245,6 +257,11 @@ a:hover {
     flex-wrap: wrap;
     width: 350px;
     z-index: 2;
+}
+
+.filter {
+    left: 25px;
+    right: auto;
 }
 
 .filter-btn {
@@ -257,7 +274,7 @@ a:hover {
     transition: all .3s ease-out;
 }
 .filter-btn:hover {
-    box-shadow: 0 0 2px 0 #000;
+    box-shadow: 0 0 2px 1px #000;
 }
 .filter-btn.active{
     background: #cacaca;
@@ -276,7 +293,55 @@ a:hover {
     background: linear-gradient(to top, #999, #fff);
 }
 
+.calculation-box {
+    position: absolute;
+    left: 50px;
+    bottom: 10px;
+    padding: 25px;
+    background-color: #fff;
+    border: 1px solid #666;
+}
+
 /* Drawing page */
+#initMap,
+#outputFlat {
+    position: relative;
+    z-index: 2;
+    margin: 100px auto 0;
+    width: 90%;
+    height: 600px;
+    opacity: 0.4;
+}
+
+#outputFlat {
+    margin-bottom: 100px;
+}
+
+.top-map-wr {
+    position: relative;
+    margin-top: 100px;
+}
+.plan-on-map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    width: 500px;
+}
+
+.map-info {
+    margin: 20px 50px 50px;
+}
+
+.map-zoom,
+.map-angle,
+.map-line {
+    font-weight: bold;
+}
+
+#chooseDots,
 #drawFlat {
     position: absolute;
     top: 0;
@@ -284,21 +349,25 @@ a:hover {
     transform: translateX(-50%);
 }
 
+#chooseDots polygon,
 #drawFlat polygon {
     fill: rgba(0,0,0,.2);
     cursor: pointer;
     transition: all .4s;
 }
 
+#chooseDots polygon:hover,
 #drawFlat polygon:hover {
     fill: #1C629C;
     fill-opacity: .5;
 }
 
+#chooseDots rect,
 #drawFlat rect {
     fill-opacity: 0;
 }
 
+#chooseDots circle,
 #drawFlat circle {
     fill: red;
 }
@@ -321,7 +390,7 @@ input {
 
 /* Plan page */
 .subtitle {
-    padding: 100px 50px 10px;
+    padding: 10px 50px;
     font: bold 24px/1.2 sans-serif;
 }
 

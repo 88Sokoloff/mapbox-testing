@@ -5,8 +5,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>OBOZ Mapbox Test</title>
-	<link href='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
 	<script src='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
+	<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.js'></script>
+	<link href='https://api.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+	<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.css' type='text/css'/>
 	<link rel="stylesheet" href="style/style.css">
 </head>
 <body>
@@ -14,11 +16,18 @@
 	<div id="map"></div>
 
 	<div class="filter">
+		<button data-prop="class" data-val="elite" class="filter-btn">Elite</button>
+		<button data-prop="parking" data-val="underground" class="filter-btn">Parking</button>
+	</div>
+
+	<div class="hide">
 		<button id="cancel" class="filter-btn">Hide/show cancelled</button>
 		<button id="complete" class="filter-btn">Hide/show completed</button>
+	</div>
 
-		<button id="elite" class="filter-btn">Elite</button>
-		<button id="parking" class="filter-btn">Parking</button>
+	<div class='calculation-box'>
+		<p>Coordinates of feature:</p>
+		<div id='calculated-area'></div>
 	</div>
 	
 	<!-- Card of the object -->
@@ -42,6 +51,9 @@
 			</div>
 		</a>
 		<div class="card-content">
+			<svg class="ico" fill="#9e9e9e" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+				<path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"></path>
+			</svg>
 			<div class="card-price">Продажи не начнутся</div>
 			<div class="card-text">1 дом в проекте</div>
 			<div class="card-text">ObozDomDevelopment</div>
@@ -56,7 +68,6 @@
 		</div>
 	</div>
 	
-	<script src='https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js' charset='utf-8'></script>
 	<script>
 		mapboxgl.accessToken = 'pk.eyJ1IjoiODhzb2tvbG9mZiIsImEiOiJjanN3d2tzZncwZW40NDRvZnVhYjFzNWdmIn0.pKR58x1O09IftAYhGgtRrA';
 		var map = new mapboxgl.Map({
@@ -71,6 +82,8 @@
 			compact: true
 		}));
 
+		const canvas = map.getCanvasContainer();
+
 		map.on('load', () => {
 
 			let warningColor = '#f18084',
@@ -78,7 +91,8 @@
 				lightColor = '#ffc773',
 				selectedColor = '#6688bb',
 				selectedLightColor = '#abbeda',
-				disabledColor = '#cacaca';
+				disabledColor = '#cacaca',
+				unfilterededColor = '#cbcbcb';
 
 			map.addSource('objects-far', {
 				'type': 'vector',
@@ -186,8 +200,11 @@
 				}
 			});
 
+			let filtFarArr = ["all", ["!=", "color", "warning"]];
+			let filtArr = ["all"];
+
 			// Dont show red circles
-			map.setFilter("objects-far", ["!=", ["get", "color"], "warning"]);
+			map.setFilter("objects-far", filtFarArr);
 
 			// Create a popup, but don't add it to the map yet.
 			var popup = new mapboxgl.Popup({
@@ -240,44 +257,191 @@
 
 			let card = document.querySelector('.card'),
 				closeCard = document.querySelector('.card-close'),
-				selectedTitle;
+				selectedTitle,
+				startPoint,
+				endPoint = {
+					type: 'FeatureCollection',
+					features: [{
+						type: 'Feature',
+						properties: {},
+						geometry: {
+							type: 'Point',
+							coordinates: [0, 0]
+						}
+					}]
+				};
 
 			function selectObj(e){
 				selectedTitle = e.features[0].properties.title;
 
-				const colorProps = ["case",
-						["==", ["get", "color"], "warning"],
-						warningColor,
-						["==", ["get", "color"], "muted"],
-						disabledColor,
-						["all", ["==", ["get", "title"], selectedTitle], ["==", ["get", "color"], "light"]],
-						selectedLightColor,
-						["==", ["get", "title"], selectedTitle],
-						selectedColor,
-						["==", ["get", "color"], "light"],
-						lightColor,
-						mainColor];
+				if(e.features[0].geometry.type == 'Point'){
+					startPoint = e.features[0].geometry.coordinates;
+				} else {
+					startPoint = e.features[0].geometry.coordinates[0][0];
+				}
 
-				const colorAreaProps = ["case",
-						["all",
-							["==", ["get", "title"], selectedTitle],
+				if(map.getLayer('point')){
+					map.removeLayer('point');
+					map.removeSource('point');
+				}
+
+				let colorProps = map.getPaintProperty('objects-far', 'circle-color'),
+					colorAreaProps = map.getPaintProperty('objects-area', 'fill-color');
+
+				if(colorProps.indexOf(selectedLightColor) != -1){ // If selection exist
+					colorProps.splice(5, 4, ["all", 
+							["==", ["get", "title"], selectedTitle], 
 							["==", ["get", "color"], "light"]],
 						selectedLightColor,
 						["==", ["get", "title"], selectedTitle],
-						selectedColor,
-						["==", ["get", "color"], "warning"],
-						warningColor,
-						["==", ["get", "color"], "muted"],
-						disabledColor,
-						["==", ["get", "color"], "light"],
-						lightColor,
-						mainColor];
+						selectedColor);
+
+					colorAreaProps.splice(1, 4, ["all", 
+							["==", ["get", "title"], selectedTitle], 
+							["==", ["get", "color"], "light"]],
+						selectedLightColor,
+						["==", ["get", "title"], selectedTitle],
+						selectedColor);
+				} else { // If selection not exist
+					colorProps.splice(5, 0, ["all", 
+							["==", ["get", "title"], selectedTitle], 
+							["==", ["get", "color"], "light"]],
+						selectedLightColor,
+						["==", ["get", "title"], selectedTitle],
+						selectedColor);
+
+					colorAreaProps.splice(1, 0, ["all", 
+							["==", ["get", "title"], selectedTitle], 
+							["==", ["get", "color"], "light"]],
+						selectedLightColor,
+						["==", ["get", "title"], selectedTitle],
+						selectedColor);
+				}
 
 				map.setPaintProperty('objects-far', 'circle-color', colorProps);
 				map.setPaintProperty('objects-area', 'fill-color', colorAreaProps);
 				map.setPaintProperty('objects-stroke', 'line-color', colorAreaProps);
 				map.setPaintProperty('objects-close', 'fill-extrusion-color', colorProps);
 			}
+
+			function getRoute(end){
+				var url = 'https://api.mapbox.com/directions/v5/mapbox/walking/' + startPoint[0] + ',' + startPoint[1] + ';' + end[0] + ',' + end[1] + '?steps=true&geometries=geojson&access_token=' + mapboxgl.accessToken;
+
+				var req = new XMLHttpRequest();
+				req.responseType = 'json';
+				req.open('GET', url, true);
+				req.onload = function() {
+					var data = req.response.routes[0];
+					var route = data.geometry.coordinates;
+					var geojson = {
+						type: 'Feature',
+						properties: {},
+						geometry: {
+							type: 'LineString',
+							coordinates: route
+						}
+					};
+					// if the route already exists on the map, reset it using setData
+					if (map.getSource('route')) {
+						map.getSource('route').setData(geojson);
+					} else { // otherwise, make a new request
+						map.addLayer({
+							id: 'route',
+							type: 'line',
+							source: {
+								type: 'geojson',
+								data: {
+									type: 'Feature',
+									properties: {},
+									geometry: {
+										type: 'LineString',
+										coordinates: geojson
+									}
+								}
+							},
+							layout: {
+								'line-join': 'round',
+								'line-cap': 'round'
+							},
+							paint: {
+								'line-color': '#3887be',
+								'line-width': 5,
+								'line-opacity': 0.75
+							}
+						});
+					}
+					// add turn instructions here at the end
+				};
+				req.send();
+			}
+
+			document.querySelector('.card-content > .ico').addEventListener('click', () => {
+				getRoute(startPoint);
+
+				canvas.style.cursor = 'pointer';
+
+				// Add starting point to the map
+				map.addLayer({
+					id: 'point',
+					type: 'circle',
+					source: {
+						type: 'geojson',
+						data: {
+							type: 'FeatureCollection',
+							features: [{
+								type: 'Feature',
+								properties: {},
+								geometry: {
+									type: 'Point',
+									coordinates: startPoint
+								}
+							}]
+						}
+					},
+					paint: {
+						'circle-radius': 10,
+						'circle-color': '#3887be'
+					}
+				});
+
+				map.on('click', e => {
+					const endCoordsObj = e.lngLat;
+					canvas.style.cursor = '';
+
+					const endCoords = Object.keys(endCoordsObj).map(key => endCoordsObj[key]);
+
+					endPoint.features[0].geometry.coordinates = endCoords;
+
+					if(map.getLayer('end')){
+						map.getSource('end').setData(endPoint);
+					} else {
+						map.addLayer({
+							id: 'end',
+							type: 'circle',
+							source: {
+								type: 'geojson',
+								data: {
+									type: 'FeatureCollection',
+									features: [{
+										type: 'Feature',
+										properties: {},
+										geometry: {
+											type: 'Point',
+											coordinates: endCoords
+										}
+									}]
+								}
+							},
+							paint: {
+								'circle-radius': 10,
+								'circle-color': '#f30'
+							}
+						});
+					}
+					getRoute(endCoords);
+				});
+
+			});
 
 			function fillCard(e){
 				let city = e.features[0].properties["city-ua"],
@@ -316,35 +480,102 @@
 
 			closeCard.addEventListener('click', function(){
 				card.classList.remove('active');
-				map.setFilter('objects-far', ['all']);
+				map.setFilter('objects-far', ['all', ["!=", "color", "warning"]]);
 				map.setFilter('objects-area', ['all']);
 				map.setFilter('objects-stroke', ['all']);
 				map.setFilter('objects-close', ['all']);
 			});
 
 			// Filter
-			let	cancelled = false,
-				completed = false;
-
-			let filtArr = ["all"];
-
 			document.querySelector('.filter').addEventListener('click', e => {
+				e.target.classList.toggle('active');
+				let prop = e.target.dataset.prop,
+					val = e.target.dataset.val,
+					colorProps = map.getPaintProperty('objects-far', 'circle-color'),
+					colorAreaProps = map.getPaintProperty('objects-area', 'fill-color'),
+					index = colorProps.indexOf(unfilterededColor);
+				if(index == -1){  // Initial click
+					colorProps.splice(-3, 0, ['any', ['!=', ['get', prop], val]], unfilterededColor);
+					colorAreaProps.splice(-3, 0, ['any', ['!=', ['get', prop], val]], unfilterededColor);
+				} else {
+					let exist = false;
+					colorProps[index - 1].forEach((element, i) => {
+						if(element.indexOf(val) != -1){
+							colorProps[index - 1].splice(i, 1);
+							colorAreaProps[index - 1].splice(i, 1);
+							exist = true;
+						}
+					});
+					if(colorProps[index - 1].length === 1) {
+						colorProps.splice(index - 1, 2);
+						colorAreaProps.splice(index - 1, 2);
+					}
+					if(!exist){
+						colorProps[index - 1].push(['!=', ['get', prop], val]);
+						colorAreaProps[index - 1].push(['!=', ['get', prop], val]);
+					}
+					console.log(colorProps);
+				}
+				
+				map.setPaintProperty('objects-far', 'circle-color', colorProps);
+				map.setPaintProperty('objects-area', 'fill-color', colorAreaProps);
+				map.setPaintProperty('objects-stroke', 'line-color', colorAreaProps);
+				map.setPaintProperty('objects-close', 'fill-extrusion-color', colorProps);
+			});
+
+			// Filter to hide
+			document.querySelector('.hide').addEventListener('click', e => {
 				let targetId = e.target.id;
 				let exist = false;
 				for(let i = 0; i < filtArr.length; i++){
 					if(filtArr[i].indexOf(targetId) !== -1){
 						exist = true;
 						filtArr.splice(i, 1);
+						filtFarArr.splice(i+1, 1);
 					}
 				}
-				if(!exist) filtArr.push(["!=", "state", targetId]);
+				if(!exist){
+					filtArr.push(["!=", "state", targetId]);
+					filtFarArr.push(["!=", "state", targetId]);
+				}
 				
-				map.setFilter("objects-far", filtArr);
+				map.setFilter("objects-far", filtFarArr);
 				map.setFilter("objects-close", filtArr);
 				map.setFilter("objects-area", filtArr);
 				map.setFilter("objects-stroke", filtArr);
 			});
 		});
+
+		var draw = new MapboxDraw({
+			displayControlsDefault: false,
+			controls: {
+				point: true,
+				polygon: true,
+				trash: true
+			}
+		});
+		map.addControl(draw, 'bottom-left');
+		
+		map.on('draw.create', updateArea);
+		map.on('draw.delete', updateArea);
+		map.on('draw.update', updateArea);
+			
+		function updateArea() {
+			const 	data = draw.getAll(),
+					answer = document.getElementById('calculated-area');
+			answer.innerHTML = '';
+			console.log(data.features);
+			
+			if (data.features.length > 0 && data.features[0].geometry.type == 'Polygon') {
+				const coord = data.features[0].geometry.coordinates[0];
+				coord.forEach(coordPair => {
+					answer.innerHTML += '<p>Lng: ' + coordPair[0] + ', Lat: ' + coordPair[1] + '</p>';
+				});
+			} else if(data.features.length > 0) {
+				const coord = data.features[0].geometry.coordinates;
+				answer.innerHTML += '<p>Lng: ' + coord[0] + ', Lat: ' + coord[1] + '</p>';
+			}
+		}
 	</script>
 </body>
 </html>
