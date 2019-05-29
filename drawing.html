@@ -253,20 +253,23 @@
 				dots = document.querySelector('#dots');
 
 			console.log(w, h);
-
-			document.querySelector('#drawFlat').width = w;
-			document.querySelector('#drawFlat').height = h;
 			
 			const dotsSVG = new SVG('chooseDots').size(w, h).polygon().draw();
 			const flatSVG = new SVG('drawFlat').size(w, h).polygon().draw();
 
 			dotsSVG.on('drawstart', e => {
+				console.log(e);
 				document.addEventListener('keydown', e => {
 					if(e.keyCode == 13){
 						dotsSVG.draw('done');
 						dotsSVG.off('drawstart');
 					}
 				});
+			});
+
+			dotsSVG.on('drawpoint', e => {
+				console.log(e);
+				
 			});
 
 			dotsSVG.on('drawstop', () => {
